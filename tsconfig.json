@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "esModuleInterop":true,
+        "target":"ESNext",
+        "outDir": "./build/"
+    },
+    "include": [
+        "index.ts",
+        "worker.ts",
+        "test.ts"
+    ]
+}

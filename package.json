@@ -1,0 +1,32 @@
+{
+  "name": "ncpu",
+  "version": "1.0.0",
+  "description": "node.js run function worker threads library",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "npx tsc",
+    "watch": "npx tsc -w",
+    "test": "npm run build && node ./build/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zy445566/ncpu.git"
+  },
+  "keywords": [
+    "node",
+    "function",
+    "worker",
+    "threads"
+  ],
+  "author": "zy445566",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zy445566/ncpu/issues"
+  },
+  "homepage": "https://github.com/zy445566/ncpu#readme",
+  "devDependencies": {
+    "@types/node": "^14.0.27",
+    "typescript": "^3.9.3"
+  }
+}
