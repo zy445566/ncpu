@@ -9,7 +9,7 @@ npm install ncpu
 # example
 ```js
 import {NCPU} from 'ncpu' // or const {NCPU} = require('ncpu')
-(async function() {
+async function main () {
   // ### run
   await NCPU.run((a,b)=>a+b,[1,2]) // result: 3
   await NCPU.run((list)=>{
@@ -25,5 +25,6 @@ import {NCPU} from 'ncpu' // or const {NCPU} = require('ncpu')
   });
   // slef time to run
   await workerFibo(38)+await workerFibo(39) // result: 102334155 //fibo(40)
-})()
+}
+main()
 ```
