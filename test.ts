@@ -48,6 +48,13 @@ const testUnit = {
             'test.pick.fibo error'
         )
     },
+    [Symbol('test.run.async.add')] : async function() {
+        assert.equal(
+            await NCPU.run(async(a,b)=>a+b,[1,2]),
+            3,
+            'test.run.async.add error'
+        )
+    },
 }
 
 

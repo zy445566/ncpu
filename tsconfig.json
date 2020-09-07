@@ -7,7 +7,7 @@
     },
     "include": [
         "index.ts",
-        "worker.ts",
+        "worker/*.ts",
         "test.ts"
     ]
 }

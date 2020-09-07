@@ -1,6 +1,6 @@
 {
   "name": "ncpu",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "node.js run function worker threads library",
   "main": "./build/index.js",
   "scripts": {
@@ -21,6 +21,8 @@
   ],
   "author": "zy445566",
   "license": "MIT",
+  "engines" : { "node" : ">=12.0.0" },
+  "engineStrict" : true,
   "bugs": {
     "url": "https://github.com/zy445566/ncpu/issues"
   },

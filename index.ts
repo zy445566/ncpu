@@ -1,18 +1,6 @@
 import  {
-    Worker
-}  from 'worker_threads';
-import  {
-    join as pathJoin
-}  from 'path';
-const workerPath = pathJoin(__dirname, 'worker.js')
-
-function runWorker (options:Object):Promise<any> {
-    return new Promise((resolve, reject) => {
-        const worker = new Worker(workerPath, options);
-        worker.on('message', resolve);
-        worker.on('error', reject);
-    });
-}
+    runWorker
+}  from './worker/index';
 export class NCPU {
     static pick(func:Function):Function {
         const functionString = func.toString();
