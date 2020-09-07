@@ -5,6 +5,7 @@ node.js run function worker multi-threaded library
 ```sh
 npm install ncpu
 ```
+[ncpu](https://github.com/zy445566/ncpu) for the `node.js` environment,use [ncpu-web](https://github.com/zy445566/ncpu-web) for the `browser` environment.
 
 # Attention
 Because it is multithreaded, context information cannot be received and parameter passing can only be achieved by cloning(
