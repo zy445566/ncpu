@@ -7,6 +7,10 @@ npm install ncpu
 ```
 [ncpu](https://github.com/zy445566/ncpu) for the `node.js` environment,use [ncpu-web](https://github.com/zy445566/ncpu-web) for the `browser` environment.
 
+
+`require:Node.js version>=12`
+
+
 # Attention
 Because it is multithreaded, context information cannot be received and parameter passing can only be achieved by cloning(
 The cloning will occur as described in the [HTML structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm), and an error will be thrown if the object cannot be cloned (e.g. because it contains functions)).
