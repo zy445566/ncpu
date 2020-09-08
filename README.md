@@ -39,8 +39,8 @@ main()
 ```
 
 # Other solutions
-[pambdajs](https://github.com/tim-hub/pambdajs)
-[napajs](https://github.com/microsoft/napajs)
+* [pambdajs](https://github.com/tim-hub/pambdajs)
+* [napajs](https://github.com/microsoft/napajs)
 
 # License
 [ncpu](https://github.com/zy445566/ncpu) is available under the MIT license. See the [LICENSE](https://github.com/zy445566/ncpu/blob/master/LICENSE) file for details.
