@@ -1,28 +1,17 @@
 import  {
-    runWorker
+    NcpuWorker
 }  from './worker/index';
-function getFunctionData (func:Function):string {
-    if(!(func instanceof Function)) {throw `${func} is not Function!`}
-    return func.toString();
-}
+
 export class NCPU {
-    static pick(func:Function):Function {
-        const functionData = getFunctionData(func);
+    static getWorker():NcpuWorker {
+        return new NcpuWorker();
+    }
+    static pick(func:Function, ncpuWorker:NcpuWorker=new NcpuWorker()):Function {
         return (...params:Array<any>)=>{
-            return runWorker ({
-                workerData:{
-                    functionData,
-                    params
-                }
-            })
+            return ncpuWorker.run(func, params);
         }
     }
-    static run (func:Function,params:Array<any>=[]):Promise<any> {
-        return runWorker ({
-            workerData:{
-                functionData:getFunctionData(func),
-                params
-            }
-        })
+    static run (func:Function,params:Array<any>=[], ncpuWorker:NcpuWorker=new NcpuWorker()):Promise<any> {
+        return ncpuWorker.run(func, params);
     };
 }

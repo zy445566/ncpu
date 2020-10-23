@@ -55,6 +55,28 @@ const testUnit = {
             'test.run.async.add error'
         )
     },
+    [Symbol('test.getWorker.fibo')] : async function() {
+        const ncpuWorker = NCPU.getWorker(); // 
+        const multiplexingWorkerFibo = await NCPU.pick((num)=>{
+            const fibo = (value)=>{
+                if(value<=2){return 1;}
+                return fibo(value-2)+fibo(value-1);
+            }
+            return fibo(num);
+        }, ncpuWorker); // reuse a thread
+        const res = await Promise.all([multiplexingWorkerFibo(38), NCPU.run((num)=>{
+            const fibo = (value)=>{
+                if(value<=2){return 1;}
+                return fibo(value-2)+fibo(value-1);
+            }
+            return fibo(num);
+        }, [39] ,ncpuWorker)]); // reuse a thread
+        assert.equal(
+            res[0]+res[1],
+            102334155,
+            'test.getWorker.fibo error'
+        )
+    },
 }
 
 
@@ -66,6 +88,10 @@ async function run(testUnitList) {
     }
 }
 (async function() {
-    await run([testUnit]);
+    try{
+        await run([testUnit]);
+    } catch(err) {
+        console.log(err)
+    }
 })();
 
