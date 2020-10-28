@@ -1,5 +1,5 @@
 # ncpu
-node.js run function worker multi-threaded library
+multi-threaded library that node.js run function worker
 
 # Installation 
 ```sh
