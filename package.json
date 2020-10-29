@@ -1,6 +1,6 @@
 {
   "name": "ncpu",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "multi-threaded library that node.js run function worker",
   "main": "./build/index.js",
   "scripts": {

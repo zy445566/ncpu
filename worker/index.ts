@@ -46,18 +46,23 @@ export class NcpuWorker {
             this.index++;
             const key = this.index;
             let timer:NodeJS.Timeout;
+            let isTaskComplete = false;
             if(timeout>=0) {
                 timer = setTimeout(()=>{
-                    this.gc();
-                    return reject(new Error('task timeout'));
+                    if(!isTaskComplete) {
+                        this.gc();
+                        isTaskComplete = true;
+                        return reject(new Error('task timeout'));
+                    }
                 }, timeout)
             }
             this.worker.postMessage({
                 key,functionData,params
             });
             this.worker.on('message', (res)=>{
-                if(res.key===key) {
+                if(res.key===key && (!isTaskComplete)) {
                     this.gc();
+                    isTaskComplete = true;
                     if(timer) {clearTimeout(timer)}
                     return resolve(res.res);
                 }
