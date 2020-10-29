@@ -64,6 +64,7 @@ export class NcpuWorker {
                     this.gc();
                     isTaskComplete = true;
                     if(timer) {clearTimeout(timer)}
+                    if(res.error) {return reject(res.error);}
                     return resolve(res.res);
                 }
             });

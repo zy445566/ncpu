@@ -8,16 +8,22 @@ type NcpuParams = {
 }
 type NcpuResult = {
     key:number,
+    error:any,
     res:any
 }
 
 parentPort.on('message', async (ncpuParams:NcpuParams) => {
-    const runFunction = new Function(
-        'params',
-        `const func = ${ncpuParams.functionData};return func(...params);`
-    );
-    const result:NcpuResult = {key:ncpuParams.key,res:undefined}
-    result.res = runFunction(ncpuParams.params);
-    if(result.res instanceof Promise) {result.res = await result.res;}
-    parentPort.postMessage(result);
+    const result:NcpuResult = {key:ncpuParams.key, error:undefined, res:undefined}
+    try {
+        const runFunction = new Function(
+            'params',
+            `const func = ${ncpuParams.functionData};return func(...params);`
+        );
+        result.res = runFunction(ncpuParams.params);
+        if(result.res instanceof Promise) {result.res = await result.res;}
+    } catch(err) {
+        result.error = err;
+    } finally {
+        parentPort.postMessage(result);
+    }
 })

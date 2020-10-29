@@ -84,6 +84,13 @@ const testUnit = {
             assert.equal(err.message, 'task timeout', 'test.run.timeout error')
         }
     },
+    [Symbol('test.run.uncatchError')] : async function() {
+        try{
+            await NCPU.run(()=>{throw new Error('uncatchError')})
+        } catch(err){
+            assert.equal(err.message, 'uncatchError', 'test.run.uncatchError')
+        }
+    },
 }
 
 
