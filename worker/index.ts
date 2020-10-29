@@ -15,20 +15,29 @@ export class NcpuWorker {
     worker:Worker;
     index:number;
     completeIndex:number;
+    
     private start() {
         this.worker = new Worker(workerPath);
         this.resetIndex();
     }
+
     private end() {
         this.worker.terminate();
         this.worker = undefined;
         this.resetIndex();
     }
+
     private resetIndex() {
         this.index = 0;
         this.completeIndex = 0;
     }
-    public run(func:Function,params:Array<any>) {
+
+    private gc() {
+        this.completeIndex++;
+        if(this.index===this.completeIndex) {this.end();}
+    }
+
+    public run(func:Function, params:Array<any>, timeout:number) {
         const functionData = getFunctionData (func);
         if(!this.worker) { 
             this.start();
@@ -36,18 +45,26 @@ export class NcpuWorker {
         return new Promise((resolve, reject) => {
             this.index++;
             const key = this.index;
+            let timer:NodeJS.Timeout;
+            if(timeout>=0) {
+                timer = setTimeout(()=>{
+                    this.gc();
+                    return reject(new Error('task timeout'));
+                }, timeout)
+            }
             this.worker.postMessage({
                 key,functionData,params
             });
             this.worker.on('message', (res)=>{
                 if(res.key===key) {
-                    this.completeIndex++;
-                    if(this.index===this.completeIndex) {this.end();}
+                    this.gc();
+                    if(timer) {clearTimeout(timer)}
                     return resolve(res.res);
                 }
             });
             this.worker.on('error', (err)=>{
                 this.end();
+                if(timer) {clearTimeout(timer)}
                 return reject(err);
             });
         });

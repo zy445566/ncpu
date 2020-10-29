@@ -77,6 +77,13 @@ const testUnit = {
             'test.getWorker.fibo error'
         )
     },
+    [Symbol('test.run.timeout')] : async function() {
+        try{
+            await NCPU.run(()=>{while(true){}},[],NCPU.getWorker(),3000)
+        } catch(err){
+            assert.equal(err.message, 'task timeout', 'test.run.timeout error')
+        }
+    },
 }
 
 
