@@ -1,6 +1,6 @@
 {
   "name": "ncpu",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "multi-threaded library that node.js run function worker",
   "main": "./build/index.js",
   "scripts": {
@@ -21,8 +21,10 @@
   ],
   "author": "zy445566",
   "license": "MIT",
-  "engines" : { "node" : ">=12.0.0" },
-  "engineStrict" : true,
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "engineStrict": true,
   "bugs": {
     "url": "https://github.com/zy445566/ncpu/issues"
   },

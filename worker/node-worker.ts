@@ -19,8 +19,7 @@ parentPort.on('message', async (ncpuParams:NcpuParams) => {
             'params',
             `const func = ${ncpuParams.functionData};return func(...params);`
         );
-        result.res = runFunction(ncpuParams.params);
-        if(result.res instanceof Promise) {result.res = await result.res;}
+        result.res = await runFunction(ncpuParams.params);
     } catch(err) {
         result.error = err;
     } finally {
