@@ -63,14 +63,14 @@ const testUnit = {
                 return fibo(value-2)+fibo(value-1);
             }
             return fibo(num);
-        }, ncpuWorker); // reuse a thread
+        }, {ncpuWorker}); // reuse a thread
         const res = await Promise.all([multiplexingWorkerFibo(38), NCPU.run((num)=>{
             const fibo = (value)=>{
                 if(value<=2){return 1;}
                 return fibo(value-2)+fibo(value-1);
             }
             return fibo(num);
-        }, [39] ,ncpuWorker)]); // reuse a thread
+        }, [39] ,{ncpuWorker})]); // reuse a thread
         assert.equal(
             res[0]+res[1],
             102334155,
@@ -79,7 +79,7 @@ const testUnit = {
     },
     [Symbol('test.run.timeout')] : async function() {
         try{
-            await NCPU.run(()=>{while(true){}},[],NCPU.getWorker(),3000)
+            await NCPU.run(()=>{while(true){}},[],{ncpuWorker:NCPU.getWorker(),timeout:3000})
         } catch(err){
             assert.equal(err.message, 'task timeout', 'test.run.timeout error')
         }
@@ -90,6 +90,12 @@ const testUnit = {
         } catch(err){
             assert.equal(err.message, 'uncatchError', 'test.run.uncatchError')
         }
+    },
+    [Symbol('test.run.injectList')] : async function() {
+        const res = await NCPU.run(()=>{
+            return require('fs')===require('fs');
+        },[],{injectList:['require']})
+        assert.equal(res, true, 'test.run.injectList')
     },
 }
 

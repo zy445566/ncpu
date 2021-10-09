@@ -37,7 +37,7 @@ export class NcpuWorker {
         if(this.index===this.completeIndex) {this.end();}
     }
 
-    public run(func:Function, params:Array<any>, timeout:number) {
+    public run(func:Function, params:Array<any>, {injectList, timeout}:{injectList:Array<string>,timeout:number}) {
         const functionData = getFunctionData (func);
         if(!this.worker) { 
             this.start();
@@ -57,7 +57,7 @@ export class NcpuWorker {
                 }, timeout)
             }
             this.worker.postMessage({
-                key,functionData,params
+                key,functionData,params,injectList
             });
             this.worker.on('message', (res)=>{
                 if(res.key===key && (!isTaskComplete)) {

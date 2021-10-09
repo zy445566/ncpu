@@ -19,12 +19,12 @@ The cloning will occur as described in the [HTML structured clone algorithm](htt
 ```js
 import {NCPU} from 'ncpu' // or const {NCPU} = require('ncpu')
 async function main () {
-  // ### run
+    // ### run
     await NCPU.run((a,b)=>a+b,[1,2]) // result: 3
     await NCPU.run((list)=>{
         return list.reduce((total,value)=>{return total+value;});
     },[[1,2,3]]) // result: 6
-  // ### pick
+    // ### pick
     const workerFibo = await NCPU.pick((num)=>{
         const fibo = (value)=>{
             if(value<=2){return 1;}
@@ -34,7 +34,7 @@ async function main () {
     });
     // slef time to run
     await workerFibo(38)+await workerFibo(39) // result: 102334155 //fibo(40)
-  // ### getWorker // reuse a thread
+    // ### getWorker // reuse a thread
     const ncpuWorker = NCPU.getWorker(); 
     const multiplexingWorkerFibo = await NCPU.pick((num)=>{
         const fibo = (value)=>{
@@ -42,14 +42,18 @@ async function main () {
             return fibo(value-2)+fibo(value-1);
         }
         return fibo(num);
-    }, ncpuWorker); // reuse a thread
+    }, {ncpuWorker}); // reuse a thread
     const res = await Promise.all([multiplexingWorkerFibo(38), NCPU.run((num)=>{
         const fibo = (value)=>{
             if(value<=2){return 1;}
             return fibo(value-2)+fibo(value-1);
         }
         return fibo(num);
-    }, [39] ,ncpuWorker)]); // reuse a thread
+    }, [39] ,{ncpuWorker})]); // reuse a thread
+    // ### inject globalData
+    await NCPU.run(()=>{
+        return require('fs') === require('fs');
+    },[],{injectList:['require']}) // result: true
 }
 main()
 ```
