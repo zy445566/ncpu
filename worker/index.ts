@@ -1,5 +1,6 @@
 import  {
-    Worker
+    Worker,
+    WorkerOptions
 }  from 'worker_threads';
 import  {
     join as pathJoin
@@ -12,66 +13,68 @@ function getFunctionData (func:Function):string {
 }
 
 export class NcpuWorker {
-    worker:Worker;
-    index:number;
-    completeIndex:number;
+    private worker:Worker;
+    private index:number;
+    private workerOptions: WorkerOptions | undefined;
+
+    constructor(options?: {workerOptions: WorkerOptions | undefined}) {
+        this.workerOptions = options?.workerOptions;
+    }
     
-    private start() {
-        this.worker = new Worker(workerPath);
-        this.resetIndex();
+    public start() {
+        if(!this.worker) {
+            this.worker = new Worker(workerPath, this.workerOptions);
+            this.resetIndex();
+        }
     }
 
-    private end() {
-        this.worker.terminate();
-        this.worker = undefined;
-        this.resetIndex();
+    public end() {
+        if(this.worker) {
+            this.worker.terminate();
+            this.worker = undefined;
+            this.resetIndex();
+        }
     }
 
     private resetIndex() {
         this.index = 0;
-        this.completeIndex = 0;
     }
 
-    private gc() {
-        this.completeIndex++;
-        if(this.index===this.completeIndex) {this.end();}
-    }
-
-    public run(func:Function, params:Array<any>, {injectList, timeout}:{injectList:Array<string>,timeout:number}) {
+    public run(func:Function, params:Array<any>) {
         const functionData = getFunctionData (func);
-        if(!this.worker) { 
-            this.start();
-        }
+        this.start();
         return new Promise((resolve, reject) => {
             this.index++;
             const key = this.index;
-            let timer:NodeJS.Timeout;
             let isTaskComplete = false;
-            if(timeout>=0) {
-                timer = setTimeout(()=>{
-                    if(!isTaskComplete) {
-                        this.gc();
-                        isTaskComplete = true;
-                        return reject(new Error('task timeout'));
-                    }
-                }, timeout)
-            }
-            this.worker.postMessage({
-                key,functionData,params,injectList
-            });
-            this.worker.on('message', (res)=>{
-                if(res.key===key && (!isTaskComplete)) {
-                    this.gc();
+            
+            // 创建命名的事件处理函数，以便后续可以移除
+            const messageHandler = (res) => {
+                if(res.key === key && (!isTaskComplete)) {
+                    // 移除事件监听器
+                    this.worker.removeListener('message', messageHandler);
+                    this.worker.removeListener('error', errorHandler);
+
                     isTaskComplete = true;
-                    if(timer) {clearTimeout(timer)}
                     if(res.error) {return reject(res.error);}
                     return resolve(res.res);
                 }
-            });
-            this.worker.on('error', (err)=>{
+            };
+            
+            const errorHandler = (err) => {
+                // 移除事件监听器
+                this.worker.removeListener('message', messageHandler);
+                this.worker.removeListener('error', errorHandler);
+                
                 this.end();
-                if(timer) {clearTimeout(timer)}
                 return reject(err);
+            };
+            
+            this.worker.on('message', messageHandler);
+            this.worker.on('error', errorHandler);
+            
+            this.worker.postMessage({
+                key, functionData, params
             });
         });
     }

@@ -1,6 +1,6 @@
 {
   "name": "ncpu",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "multi-threaded library that node.js run function worker",
   "main": "./build/index.js",
   "scripts": {
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/zy445566/ncpu#readme",
   "devDependencies": {
-    "@types/node": "^14.0.27",
-    "typescript": "^3.9.3"
+    "@types/node": "^20.19.17",
+    "typescript": "^5.9.2"
   }
 }

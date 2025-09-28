@@ -34,30 +34,72 @@ async function main () {
     });
     // slef time to run
     await workerFibo(38)+await workerFibo(39) // result: 102334155 //fibo(40)
-    // ### getWorker // reuse a thread
-    const ncpuWorker = NCPU.getWorker(); 
+    // ### getWorkerPool // reuse a thread
+    const ncpuWorkerPool = NCPU.getWorkerPool(); 
     const multiplexingWorkerFibo = await NCPU.pick((num)=>{
         const fibo = (value)=>{
             if(value<=2){return 1;}
             return fibo(value-2)+fibo(value-1);
         }
         return fibo(num);
-    }, {ncpuWorker}); // reuse a thread
+    }, {ncpuWorkerPool}); // reuse a thread
     const res = await Promise.all([multiplexingWorkerFibo(38), NCPU.run((num)=>{
         const fibo = (value)=>{
             if(value<=2){return 1;}
             return fibo(value-2)+fibo(value-1);
         }
         return fibo(num);
-    }, [39] ,{ncpuWorker})]); // reuse a thread
-    // ### inject globalData
-    await NCPU.run(()=>{
-        return require('fs') === require('fs');
-    },[],{injectList:['require']}) // result: true
+    }, [39] ,{ncpuWorkerPool})]); // reuse a thread
+    
+    // ### 使用默认共享工作池
+    const defaultPool = NCPU.getDefaultWorkerPool();
+    await NCPU.run((a, b) => a + b, [5, 10], {ncpuWorkerPool: defaultPool}); // result: 15
+    
+    // ### 在应用程序退出前终止所有工作线程
+    await NCPU.terminateAll();
 }
 main()
 ```
 The above example spawns a Worker thread for each callback function when runing. In actual practice, use a pool of Workers instead for these kinds of tasks. Otherwise, the overhead of creating Workers would likely exceed their benefit.
+
+# Advanced Usage
+
+## Using the Default Shared Worker Pool
+
+```js
+// 获取默认共享工作池
+const defaultPool = NCPU.getDefaultWorkerPool();
+
+// 使用默认工作池执行多个任务
+const task1 = NCPU.run(heavyFunction1, [param1, param2], {ncpuWorkerPool: defaultPool});
+const task2 = NCPU.run(heavyFunction2, [param3], {ncpuWorkerPool: defaultPool});
+const results = await Promise.all([task1, task2]);
+```
+
+## Properly Terminating Worker Threads
+
+```js
+// 在应用程序退出前终止所有工作线程
+process.on('SIGINT', async () => {
+  console.log('Terminating worker threads...');
+  await NCPU.terminateAll();
+  process.exit(0);
+});
+```
+
+## Setting Timeout for Tasks
+
+```js
+// 创建一个有超时设置的工作池
+const timeoutPool = NCPU.getWorkerPool({timeout: 5000}); // 5秒超时
+
+try {
+  // 如果任务执行超过5秒，将抛出超时错误
+  await NCPU.run(longRunningTask, [], {ncpuWorkerPool: timeoutPool});
+} catch (err) {
+  console.error('Task timed out:', err.message);
+}
+```
 
 # Other solutions
 * [pambdajs](https://github.com/tim-hub/pambdajs)

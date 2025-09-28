@@ -55,22 +55,22 @@ const testUnit = {
             'test.run.async.add error'
         )
     },
-    [Symbol('test.getWorker.fibo')] : async function() {
-        const ncpuWorker = NCPU.getWorker(); // 
+    [Symbol('test.getWorkerPool.fibo')] : async function() {
+        const ncpuWorkerPool = NCPU.getWorkerPool(); // 
         const multiplexingWorkerFibo = await NCPU.pick((num)=>{
             const fibo = (value)=>{
                 if(value<=2){return 1;}
                 return fibo(value-2)+fibo(value-1);
             }
             return fibo(num);
-        }, {ncpuWorker}); // reuse a thread
+        }, {ncpuWorkerPool}); // reuse a thread
         const res = await Promise.all([multiplexingWorkerFibo(38), NCPU.run((num)=>{
             const fibo = (value)=>{
                 if(value<=2){return 1;}
                 return fibo(value-2)+fibo(value-1);
             }
             return fibo(num);
-        }, [39] ,{ncpuWorker})]); // reuse a thread
+        }, [39] ,{ncpuWorkerPool})]); // reuse a thread
         assert.equal(
             res[0]+res[1],
             102334155,
@@ -79,9 +79,9 @@ const testUnit = {
     },
     [Symbol('test.run.timeout')] : async function() {
         try{
-            await NCPU.run(()=>{while(true){}},[],{ncpuWorker:NCPU.getWorker(),timeout:3000})
+            await NCPU.run(()=>{while(true){}},[],{ncpuWorkerPool:NCPU.getWorkerPool({timeout:3000})})
         } catch(err){
-            assert.equal(err.message, 'task timeout', 'test.run.timeout error')
+            assert.equal(err.message, 'Task execution timed out after 3000ms', 'test.run.timeout error')
         }
     },
     [Symbol('test.run.uncatchError')] : async function() {
@@ -91,25 +91,24 @@ const testUnit = {
             assert.equal(err.message, 'uncatchError', 'test.run.uncatchError')
         }
     },
-    [Symbol('test.run.injectList')] : async function() {
-        const res = await NCPU.run(()=>{
-            return require('fs')===require('fs');
-        },[],{injectList:['require']})
-        assert.equal(res, true, 'test.run.injectList')
-    },
 }
 
 
 async function run(testUnitList) {
     for(let testUnitValue of testUnitList) {
         for(let testFunc of Object.getOwnPropertySymbols(testUnitValue)) {
+            console.log(testFunc,'start')
             await testUnitValue[testFunc]();
+            console.log(testFunc,'end')
         }
     }
 }
 (async function() {
     try{
-        await run([testUnit]);
+        await run([testUnit]).catch(err=>{  
+            console.log(err)
+        })
+
     } catch(err) {
         console.log(err)
     }
